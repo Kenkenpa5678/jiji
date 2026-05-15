@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026年 春の時事マスター</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- Icons Custom Implementation (Simplified for Standalone HTML) ---
+        const Icon = ({ name, className }) => {
+            useEffect(() => {
+                lucide.createIcons();
+            }, []);
+            return <i data-lucide={name} className={className}></i>;
+        };
+
+        const Brain = ({className}) => <Icon name="brain" className={className} />;
+        const BookOpen = ({className}) => <Icon name="book-open" className={className} />;
+        const ArrowRight = ({className}) => <Icon name="arrow-right" className={className} />;
+        const ArrowLeft = ({className}) => <Icon name="arrow-left" className={className} />;
+        const CheckCircle2 = ({className}) => <Icon name="check-circle-2" className={className} />;
+        const XCircle = ({className}) => <Icon name="x-circle" className={className} />;
+        const RotateCcw = ({className}) => <Icon name="rotate-ccw" className={className} />;
+        const Trophy = ({className}) => <Icon name="trophy" className={className} />;
+        const Globe = ({className}) => <Icon name="globe" className={className} />;
+        const Clock = ({className}) => <Icon name="clock" className={className} />;
+        const ListIcon = ({className}) => <Icon name="list" className={className} />;
+
+
+        const questionsData = [
+            // --- 社会・暮らし ---
+            {
+                id: 1, category: '社会・暮らし',
+                question: '2026年4月から開始された、自転車の比較的軽い交通違反に対して反則金を科す新たな制度は何と呼ばれますか？',
+                options: ['赤切符制度', '青切符制度', '黄切符制度', '自転車免許制度'],
+                answer: '青切符制度',
+                explanation: '反則金を納めれば刑事罰を免れる「青切符」の対象が、16歳以上の自転車の交通違反（信号無視やスマホながら運転など）にも拡大されました。'
+            },
+            {
+                id: 2, category: '社会・暮らし',
+                question: '深刻化する「カスタマーハラスメント（カスハラ）」への対策として、2026年春に全国の自治体に先駆けて防止条例を施行した都府県はどこですか？',
+                options: ['東京都', '大阪府', '北海道', '福岡県'],
+                answer: '東京都',
+                explanation: '顧客による著しい迷惑行為（カスハラ）から従業員を守るため、東京都が全国初の防止条例を施行し、企業に対策を義務付けました。'
+            },
+            {
+                id: 3, category: '社会・暮らし',
+                question: 'オーバーツーリズム対策として、2026年春から富士山の特定の登山道に設置され、通行料の徴収と人数制限を行う設備は何ですか？',
+                options: ['入山ゲート', 'ロープウェイ', '顔認証システム', 'ETCゲート'],
+                answer: '入山ゲート',
+                explanation: '山梨県側の吉田口登山道などにゲートが設置され、1日の登山者数の上限設定や通行料の義務化が本格運用されました。'
+            },
+            {
+                id: 4, category: '社会・暮らし',
+                question: '2026年5月、総務省や自治体が注意喚起を行った新手の詐欺の手口は、何を装ってQRコード決済から送金させるものでしたか？',
+                options: ['宅配便の不在通知', '住民税の催促', '電気代の未払い', 'クレジットカードの不正利用'],
+                answer: '住民税の催促',
+                explanation: '「住民税が未納である」と不安を煽り、PayPayなどのQRコード決済アプリを使って送金させる巧妙な詐欺が多発しました。'
+            },
+            {
+                id: 5, category: '社会・暮らし',
+                question: '2024年秋に従来の健康保険証が廃止されて以降、2026年現在で基本となっている保険証の形は何ですか？',
+                options: ['マイナ保険証', 'スマホ保険証', '生体認証', '顔認証システム'],
+                answer: 'マイナ保険証',
+                explanation: 'マイナンバーカードと一体化した「マイナ保険証」への完全移行が完了し、医療機関でのデータ連携が定着しつつあります。'
+            },
+            {
+                id: 6, category: '社会・暮らし',
+                question: '教員の長時間労働是正のため、公立中学校の休日の「ある活動」を地域のスポーツクラブなどに委ねる取り組みが2026年度から本格化しました。何ですか？',
+                options: ['部活動', '補習授業', '生徒会活動', '進路指導'],
+                answer: '部活動',
+                explanation: '「部活動の地域移行」と呼ばれ、休日の部活動の指導を教員ではなく地域の指導者や民間団体に委ねる改革が進められています。'
+            },
+            {
+                id: 7, category: '社会・暮らし',
+                question: '社会問題化した悪質な「ホストクラブ」の売掛金（ツケ払い）問題に対して、2026年春までに警察や自治体が強化した対策の根拠となる法律・条例は何ですか？',
+                options: ['風営法・ぼったくり防止条例', '消費者契約法', '独占禁止法', '貸金業法'],
+                answer: '風営法・ぼったくり防止条例',
+                explanation: '法外な売掛金による若年女性の被害を防ぐため、風営法の厳格な運用や各自治体の条例改正による規制強化が行われました。'
+            },
+            {
+                id: 8, category: '社会・暮らし',
+                question: '近年SNSで「高収入」などをうたい、若者を強盗や特殊詐欺に加担させる犯罪行為を何と呼びますか？',
+                options: ['闇バイト', '裏稼業', 'ステルスワーク', 'ブラック派遣'],
+                answer: '闇バイト',
+                explanation: '「闇バイト」による凶悪犯罪が後を絶たず、2026年春にも警察庁がAIを活用したSNSの監視や若者への警告を強化しています。'
+            },
+            {
+                id: 9, category: '社会・暮らし',
+                question: '2026年5月で、新型コロナウイルス感染症の感染症法上の位置づけが「5類」に移行してから何年が経過しましたか？',
+                options: ['1年', '2年', '3年', '4年'],
+                answer: '3年',
+                explanation: '2023年5月8日に「2類相当」から「5類」へ移行して以来、丸3年が経過し、社会経済活動は完全にコロナ前の水準を取り戻しました。'
+            },
+            {
+                id: 10, category: '社会・暮らし',
+                question: '2026年の大型連休（GW）において、円安の影響で海外旅行が敬遠される一方、国内で過去最高の訪問者数を記録した地域の特徴は何ですか？',
+                options: ['地方の温泉地', '都心の大型商業施設', 'テーマパーク', '自然豊かな離島'],
+                answer: '地方の温泉地',
+                explanation: '物価高と円安の影響で「安・近・短」の旅行が好まれ、インバウンド客とともに地方の温泉地やローカル観光地がかつてない盛況を見せました。'
+            },
+
+            // --- 政治・法律 ---
+            {
+                id: 11, category: '政治・法律',
+                question: '2026年5月の大型連休中、高市早苗首相が歴訪した国の組み合わせとして正しいものはどれですか？',
+                options: ['アメリカ・カナダ', 'フランス・ドイツ', 'ベトナム・オーストラリア', 'インド・フィリピン'],
+                answer: 'ベトナム・オーストラリア',
+                explanation: '高市首相は連休を利用して東南アジアとオセアニアを歴訪し、安全保障や経済協力について首脳会談を行いました。'
+            },
+            {
+                id: 12, category: '政治・法律',
+                question: '離婚後の子どもの親権について、従来の単独親権に加えて「どちらか」を選べるようにした改正民法が2026年に本格施行されました。何制度ですか？',
+                options: ['共同親権', '分割親権', '選択的夫婦別姓', '特別養子縁組'],
+                answer: '共同親権',
+                explanation: '父母の協議により、離婚後も双方に親権を認める「共同親権」か、従来通りの「単独親権」かを選択できる制度がスタートしました。'
+            },
+            {
+                id: 13, category: '政治・法律',
+                question: '国が重要な機密情報を扱う民間企業の従業員らを身辺調査し、資格を与える制度を創設した「新法」は何と呼ばれますか？',
+                options: ['セキュリティ・クリアランス制度', 'マイナンバー連携法', 'サイバー防衛法', 'スパイ防止法'],
+                answer: 'セキュリティ・クリアランス制度',
+                explanation: '経済安全保障を強化するため、機密情報へのアクセス権を国が認定する「セキュリティ・クリアランス（適性評価）」制度が導入されました。'
+            },
+            {
+                id: 14, category: '政治・法律',
+                question: '大規模な災害や感染症の発生時に、国が地方自治体に対して必要な指示を出せる特例を設けた、改正された法律は何ですか？',
+                options: ['地方自治法', '災害対策基本法', '国家安全保障局設置法', '感染症法'],
+                answer: '地方自治法',
+                explanation: '緊急時に国から自治体への「指示権」を強化する内容を盛り込んだ改正地方自治法が運用され、国と地方のあり方が議論されています。'
+            },
+            {
+                id: 15, category: '政治・法律',
+                question: '親の就労要件を問わず、時間単位で保育所などを利用できる制度が2026年4月から全国の自治体で本格実施されました。この制度の名称は？',
+                options: ['こども誰でも通園制度', 'フリー保育制度', '一時預かり無償化', '学童保育拡充'],
+                answer: 'こども誰でも通園制度',
+                explanation: '専業主婦家庭などの孤立を防ぐため、親が働いていなくても一定時間子どもを保育施設に預けられる制度が全国展開されました。'
+            },
+            {
+                id: 16, category: '政治・法律',
+                question: '2026年春、政府が男性の育児休業取得率について、2030年までに達成を目指すと再確認した目標数値は何％ですか？',
+                options: ['30%', '50%', '85%', '100%'],
+                answer: '85%',
+                explanation: '政府は少子化対策の一環として、男性の育休取得率を2025年に50％、2030年には85％まで引き上げる高い目標を掲げています。'
+            },
+            {
+                id: 17, category: '政治・法律',
+                question: '2026年4月、防衛費の大幅な増額に伴う財源確保策として、政府が一部段階的に引き上げを開始した税金は何ですか？',
+                options: ['消費税', '法人税・たばこ税', '所得税', '自動車税'],
+                answer: '法人税・たばこ税',
+                explanation: '防衛力強化のための財源として、法人税、所得税、たばこ税の増税が決定されており、その一部が段階的に実施され始めました。'
+            },
+            {
+                id: 18, category: '政治・法律',
+                question: '2024年の政治資金パーティー裏金事件を受けて改正された法律で、2026年に入りその運用状況や抜け穴が国会で再検証されている法律は？',
+                options: ['政治資金規正法', '公職選挙法', '政党助成法', '国家公務員倫理法'],
+                answer: '政治資金規正法',
+                explanation: '裏金事件を契機に改正された政治資金規正法ですが、連座制の適用範囲や企業・団体献金のあり方について引き続き議論が続いています。'
+            },
+            {
+                id: 19, category: '政治・法律',
+                question: '増え続ける「空き家」対策として、自治体が所有者に代わって危険な空き家を解体・撤去できる制度の名称は何ですか？',
+                options: ['行政代執行', '強制執行', '没収措置', '区画整理'],
+                answer: '行政代執行',
+                explanation: '倒壊の危険がある「特定空き家」に対し、自治体が強制的に解体を行う行政代執行の件数が、法改正により2026年に増加しています。'
+            },
+            {
+                id: 20, category: '政治・法律',
+                question: '2026年4月、物価高対策として前年に行われた「所得税・住民税の定額減税」の効果が薄れたとして、野党が求めた代替の経済対策は主に何ですか？',
+                options: ['消費税の減税', 'ベーシックインカムの導入', '法人税の引き下げ', '公共事業の拡大'],
+                answer: '消費税の減税',
+                explanation: '一時的な定額減税ではなく、持続的な物価高対策として消費税の時限的な引き下げや廃止を野党側が強く主張しました。'
+            },
+
+            // --- 経済・ビジネス ---
+            {
+                id: 21, category: '経済・ビジネス',
+                question: '2026年4月の企業倒産件数において、前年比で大幅増となり過去最多を記録した倒産の主な理由は何ですか？',
+                options: ['人手不足倒産', '後継者難倒産', '物価高倒産', 'コロナ融資返済倒産'],
+                answer: '物価高倒産',
+                explanation: '原材料費の高騰やエネルギー価格の上昇、記録的な円安などを背景とした「物価高倒産」が急増し、中小企業を直撃しています。'
+            },
+            {
+                id: 22, category: '経済・ビジネス',
+                question: '2026年4月末の金融政策決定会合で、日本銀行（日銀）がインフレ抑制のために決定した金融政策はどれですか？',
+                options: ['マイナス金利の復活', '追加の利上げ', 'ゼロ金利の維持', '量的緩和の再開'],
+                answer: '追加の利上げ',
+                explanation: '過度な円安と物価上昇に対応するため、日銀は政策金利をさらに引き上げる「追加利上げ」に踏み切り、住宅ローン金利などに影響が出ました。'
+            },
+            {
+                id: 23, category: '経済・ビジネス',
+                question: '2026年4月、外国為替市場で一時、歴史的な円安水準となる1ドル＝何円台を突破しましたか？',
+                options: ['140円台', '150円台', '160円台', '170円台'],
+                answer: '160円台',
+                explanation: '日米の金利差などを背景に円売りドル買いが加速し、一時1ドル＝160円台後半まで円安が進行。政府・日銀による為替介入が実施されました。'
+            },
+            {
+                id: 24, category: '経済・ビジネス',
+                question: '一般のドライバーが自家用車を使って有償で客を乗せるサービスで、2026年春に大都市圏を中心に大幅に規制緩和されたものは何ですか？',
+                options: ['カーシェアリング', 'ライドシェア', 'ヒッチハイク', 'デマンドタクシー'],
+                answer: 'ライドシェア',
+                explanation: 'タクシー運転手不足の解消を目的に「日本版ライドシェア」が解禁され、2026年には利用エリアや時間帯が大幅に拡大されました。'
+            },
+            {
+                id: 25, category: '経済・ビジネス',
+                question: '2026年の「春闘（春季労使交渉）」において、大企業を中心に前年を上回る高い水準を記録した「平均賃上げ率」はおよそ何％台でしたか？',
+                options: ['2%台', '3%台', '5%台', '8%台'],
+                answer: '5%台',
+                explanation: '物価高への対応と人材確保のため、労働組合の要求に対し企業側も満額回答が相次ぎ、平均で5%を超える高い賃上げ率が実現しました。'
+            },
+            {
+                id: 26, category: '経済・ビジネス',
+                question: '訪日外国人客による日本国内での消費額（インバウンド消費）が、2026年第1四半期に過去最高を更新しました。主な理由は何ですか？',
+                options: ['円高の進行', '歴史的な円安', 'ビザの完全免除', '東京五輪の開催'],
+                answer: '歴史的な円安',
+                explanation: '歴史的な円安により外国人にとって日本の物価が相対的に非常に安くなったため、訪日客数・消費額ともに爆発的に増加しました。'
+            },
+            {
+                id: 27, category: '経済・ビジネス',
+                question: '世界最大の半導体受託製造企業であるTSMCが、日本のどの県に第2工場を建設し、2026年に本格的な工事を開始しましたか？',
+                options: ['北海道', '熊本県', '茨城県', '愛知県'],
+                answer: '熊本県',
+                explanation: '台湾のTSMCは熊本県菊陽町に第1工場を稼働させたのに続き、同県内にさらに高度な半導体を製造する第2工場の建設を進めています。'
+            },
+            {
+                id: 28, category: '経済・ビジネス',
+                question: '次世代半導体の国産化を目指し、北海道千歳市に工場を建設している日本の新会社「ラピダス」が、2026年春に開始したことは何ですか？',
+                options: ['試作ラインの稼働', 'スマートフォンの発売', '海外工場の買収', '完全撤退'],
+                answer: '試作ラインの稼働',
+                explanation: 'ラピダスは2025年の試作ライン稼働目標を経て、2026年には最先端となる2ナノ世代半導体の試作を着実に進め、量産化への準備を加速しています。'
+            },
+            {
+                id: 29, category: '経済・ビジネス',
+                question: '消費税の適格請求書等保存方式（インボイス制度）導入から数年経過し、2026年に廃業や事業転換を迫られている主な層は誰ですか？',
+                options: ['大企業', '免税事業者（フリーランス等）', '海外投資家', '公務員'],
+                answer: '免税事業者（フリーランス等）',
+                explanation: 'インボイスを発行できない免税事業者が取引から排除されたり、課税事業者への転換で税負担が増加したりし、個人事業主を中心に影響が長期化しています。'
+            },
+            {
+                id: 30, category: '経済・ビジネス',
+                question: '2026年春、日本の株式市場で日経平均株価が初めて突破した史上最高値の節目はいくらですか？',
+                options: ['3万円', '4万円', '4万5千円', '5万円'],
+                answer: '4万5千円',
+                explanation: '企業業績の好調や海外投資家からの資金流入を背景に、日経平均株価は2024年に4万円を突破した後も上昇基調を続け、4万5千円の大台を突破しました。'
+            },
+
+            // --- 国際情勢 ---
+            {
+                id: 31, category: '国際情勢',
+                question: '2026年4月、議会総選挙で長年「強権的」とされたオルバーン首相の与党が敗北し、政権交代が起きた東ヨーロッパの国はどこですか？',
+                options: ['ポーランド', 'ルーマニア', 'ハンガリー', 'チェコ'],
+                answer: 'ハンガリー',
+                explanation: 'ハンガリー総選挙で親ロシア的なオルバーン政権が退陣し、親EU路線を掲げる新興政党が勝利したことで、欧州の勢力図に変化が生じました。'
+            },
+            {
+                id: 32, category: '国際情勢',
+                question: '緊迫する中東情勢の中、2026年4月に日本の商船三井のLNG船が通過した、世界の原油輸送の要衝となる海峡はどこですか？',
+                options: ['マラッカ海峡', 'スエズ運河', 'ホルムズ海峡', 'ボスポラス海峡'],
+                answer: 'ホルムズ海峡',
+                explanation: 'イランによる事実上の海上封鎖リスクが高まる中、日本のエネルギー安全保障に直結するホルムズ海峡の航行安全確保が国際問題となっています。'
+            },
+            {
+                id: 33, category: '国際情勢',
+                question: '2026年5月、台湾（中華民国）の新総統が就任演説を行いました。前任の蔡英文氏から政権を引き継いだ新総統は誰ですか？',
+                options: ['頼清徳（ライ・チントー）', '馬英九（マー・インチウ）', '習近平（シー・ジンピン）', '侯友宜（ホウ・ユウイー）'],
+                answer: '頼清徳（ライ・チントー）',
+                explanation: '民主進歩党（民進党）の頼清徳氏が新総統に就任し、中国の軍事的圧力が強まる中、台湾の民主主義防衛と現状維持を強調しました。'
+            },
+            {
+                id: 34, category: '国際情勢',
+                question: '2026年春、アメリカの連邦準備制度理事会（FRB）がインフレ再燃の懸念から決定した金融政策の方針はどれですか？',
+                options: ['利下げの延期（高金利維持）', 'マイナス金利導入', '大規模な量的緩和', '新通貨の発行'],
+                answer: '利下げの延期（高金利維持）',
+                explanation: '米国のインフレ率が高止まりしたため、市場が期待していた利下げは見送られ、長期間にわたって高い政策金利が維持されています。'
+            },
+            {
+                id: 35, category: '国際情勢',
+                question: 'ロシアによる侵攻が長期化するウクライナの復興を支援するため、2026年5月に主要国が集まって開かれた国際会議の名称は？',
+                options: ['ウクライナ平和サミット', 'ウクライナ復興会議', 'G7キエフ会合', '国連特別総会'],
+                answer: 'ウクライナ復興会議',
+                explanation: '破壊されたインフラの再建や経済支援について協議するため、日本を含む支援国や民間企業が参加する復興会議が欧州で開催されました。'
+            },
+            {
+                id: 36, category: '国際情勢',
+                question: '人口世界一となったインドで、モディ首相が率いる政権が2026年に発表した高い経済成長率の目標数値は年率約何％ですか？',
+                options: ['3%台', '5%台', '7%台', '10%台'],
+                answer: '7%台',
+                explanation: 'インド経済はIT産業やインフラ投資に牽引され、世界トップクラスの年率7%超の経済成長を維持し、グローバルサウスの盟主として影響力を高めています。'
+            },
+            {
+                id: 37, category: '国際情勢',
+                question: '中国経済の低迷の最大の要因とされ、2026年現在も多くの開発企業が破綻危機にある問題は何ですか？',
+                options: ['IT企業規制', '不動産不況', '少子高齢化', '米中貿易摩擦'],
+                answer: '不動産不況',
+                explanation: '恒大集団などの破綻に端を発した不動産市場の深刻な低迷が解消されず、中国の地方財政や個人消費に大きな悪影響を及ぼし続けています。'
+            },
+            {
+                id: 38, category: '国際情勢',
+                question: '2026年11月に控えるアメリカ大統領選挙に向けて、4月〜5月に両党の候補者選びが大詰めを迎えました。事実上の争いとなっている2人は誰ですか？',
+                options: ['バイデン 対 トランプ', 'オバマ 対 ブッシュ', 'ハリス 対 デサンティス', '次期候補はまだ未定'],
+                answer: 'バイデン 対 トランプ',
+                explanation: '民主党のバイデン現大統領と、共和党のトランプ前大統領による、2020年選挙の再戦が事実上確定し、激しい選挙戦が展開されています。（※設定上の主流な予測）'
+            },
+            {
+                id: 39, category: '国際情勢',
+                question: '北朝鮮が2026年春に日本海に向けて発射を強行し、国連安保理決議違反だと非難されたものは、弾道ミサイル技術を用いた何ですか？',
+                options: ['軍事偵察衛星', '有人宇宙船', '気象観測気球', '大陸間通信ケーブル'],
+                answer: '軍事偵察衛星',
+                explanation: '北朝鮮は宇宙空間からの監視能力を高めるため、弾道ミサイル技術を転用した軍事偵察衛星の打ち上げを繰り返し、地域の緊張を高めています。'
+            },
+            {
+                id: 40, category: '国際情勢',
+                question: '深刻な環境問題となっている「海洋プラスチックごみ」の削減に向けて、2026年に国際社会で採択に向けた最終交渉が行われているものは何ですか？',
+                options: ['パリ協定', 'ワシントン条約', 'プラスチック汚染防止条約', '京都議定書'],
+                answer: 'プラスチック汚染防止条約',
+                explanation: 'プラごみの生産から廃棄までを国際的に規制する、初の法的拘束力を持つ国際条約（プラスチック条約）の制定に向けた交渉が大詰めを迎えました。'
+            },
+
+            // --- IT・科学・宇宙 ---
+            {
+                id: 41, category: 'IT・科学・宇宙',
+                question: '2026年5月、総務省の調査で小学4〜6年生の75％以上がすでに利用していることが分かり、リテラシー教育が急務となっている技術は何ですか？',
+                options: ['生成AI', 'メタバース', '暗号資産', 'VRゴーグル'],
+                answer: '生成AI',
+                explanation: 'ChatGPTなどに代表される「生成AI（人工知能）」が低年齢層にも急速に普及しており、学習への影響や正しい使い方が議論されています。'
+            },
+            {
+                id: 42, category: 'IT・科学・宇宙',
+                question: '2026年5月上旬、マネーフォワードなど複数の企業でサービス障害や情報流出懸念を引き起こした原因は、どの開発プラットフォームへの不正アクセスでしたか？',
+                options: ['AWS', 'GitHub', 'Google Cloud', 'Microsoft Azure'],
+                answer: 'GitHub',
+                explanation: '世界中のエンジニアが利用するソースコード管理サービス「GitHub」の企業アカウントがサイバー攻撃を受け、サプライチェーン攻撃のリスクが浮き彫りになりました。'
+            },
+            {
+                id: 43, category: 'IT・科学・宇宙',
+                question: '2026年4月、アルテミス計画の一環で打ち上げられ、人類史上最も地球から遠い地点に到達したのち帰還したNASAの宇宙船の名前は？',
+                options: ['アポロ', 'オリオン', 'スペースX', 'ハッブル'],
+                answer: 'オリオン',
+                explanation: '有人月周回飛行計画に向けて、無人の宇宙船「オリオン」が地球から約40万キロ離れた月の裏側まで到達し、無事帰還しました。'
+            },
+            {
+                id: 44, category: 'IT・科学・宇宙',
+                question: '日本の主力大型ロケットとして、2026年春にも連続して人工衛星の軌道投入に成功し、世界の宇宙ビジネス参入へ弾みをつけたロケットの名称は？',
+                options: ['H2Aロケット', 'H3ロケット', 'イプシロン', 'ファルコン9'],
+                answer: 'H3ロケット',
+                explanation: '初号機の失敗を乗り越え、コストダウンと大型化を実現した新型の「H3ロケット」が連続打ち上げに成功し、日本の宇宙開発の主力となっています。'
+            },
+            {
+                id: 45, category: 'IT・科学・宇宙',
+                question: '電気自動車（EV）の航続距離を飛躍的に伸ばし、充電時間を短縮できる次世代電池として、2026年に国内メーカーが量産化発表したものは何ですか？',
+                options: ['リチウムイオン電池', '全固体電池', '水素燃料電池', 'ナトリウム硫黄電池'],
+                answer: '全固体電池',
+                explanation: '液体の電解質を固体に変えることで、安全性が高く大容量化が可能な「全固体電池」の搭載EVの発売目標が、トヨタなどの自動車メーカーから発表されました。'
+            },
+            {
+                id: 46, category: 'IT・科学・宇宙',
+                question: '特定の条件下でシステムが運転を完全に担い、運転手が不要となる「自動運転レベル4」の技術が、2026年春に日本全国の何に本格導入され始めましたか？',
+                options: ['新幹線', '路線バス・コミュニティバス', '自家用車', '長距離トラック'],
+                answer: '路線バス・コミュニティバス',
+                explanation: '運転手不足の解消や過疎地の足を守るため、定められたルートを走る路線バスにおいて、無人運転（レベル4）の社会実装が地方から拡大しています。'
+            },
+            {
+                id: 47, category: 'IT・科学・宇宙',
+                question: '生成AIの学習に無断で著作物が使用される問題に対して、2026年に日本政府や文化庁が策定・公開したものは何ですか？',
+                options: ['AI完全禁止法', 'クリエイター保護税', 'AIと著作権に関するガイドライン', 'ネット検閲システム'],
+                answer: 'AIと著作権に関するガイドライン',
+                explanation: 'AI開発企業とクリエイターの権利保護のバランスを取るため、どのようなデータ学習が著作権侵害にあたるかを示した公式な指針が示されました。'
+            },
+            {
+                id: 48, category: 'IT・科学・宇宙',
+                question: '宇宙空間に漂い、人工衛星との衝突リスクとなっている「宇宙ゴミ」を何と呼びますか？（2026年に日本のベンチャー企業が除去実証実験に成功）',
+                options: ['スペースダスト', '宇宙デブリ', 'メテオライト', 'サテライトスクラップ'],
+                answer: '宇宙デブリ',
+                explanation: '運用を終えた衛星やロケットの破片である「宇宙デブリ」を、特殊なロボットアームや磁力で捕獲して大気圏で燃やして除去する技術の実証が進んでいます。'
+            },
+
+            // --- スポーツ・エンタメ ---
+            {
+                id: 49, category: 'スポーツ・エンタメ',
+                question: '2026年2月〜3月に開催された冬季オリンピック・パラリンピックの開催都市はどこでしたか？',
+                options: ['北京（中国）', 'ミラノ・コルティナ（イタリア）', '札幌（日本）', 'ソルトレイクシティ（アメリカ）'],
+                answer: 'ミラノ・コルティナ（イタリア）',
+                explanation: '2026年の冬季五輪はイタリアのミラノとコルティナダンペッツォで共同開催され、日本選手団も多くのメダルを獲得する活躍を見せました。'
+            },
+            {
+                id: 50, category: 'スポーツ・エンタメ',
+                question: '2026年秋に愛知県と名古屋市で共同開催される、アジア最大の国際総合スポーツ競技大会の名称は何ですか？',
+                options: ['アジア競技大会（アジア大会）', '東アジア競技大会', 'パンパシフィック選手権', 'ワールドゲームズ'],
+                answer: 'アジア競技大会（アジア大会）',
+                explanation: '日本では1994年の広島大会以来となる「第20回アジア競技大会（愛知・名古屋2026）」が開催され、春からボランティア研修などが本格化しています。'
+            },
+            {
+                id: 51, category: 'スポーツ・エンタメ',
+                question: '2026年6月から北中米（アメリカ・カナダ・メキシコ）で開催されるサッカーの祭典「FIFAワールドカップ」で、この大会から出場枠は何カ国に拡大されましたか？',
+                options: ['32カ国', '40カ国', '48カ国', '64カ国'],
+                answer: '48カ国',
+                explanation: 'ワールドカップの出場枠が従来の32カ国から48カ国へ大幅に拡大され、アジア枠も増加したため、日本代表の予選突破の条件にも変化が生じました。'
+            },
+            {
+                id: 52, category: 'スポーツ・エンタメ',
+                question: 'アメリカの大リーグ（MLB）で、2026年春にも日本人選手として前人未到の通算本塁打記録や盗塁記録を更新し続けているロサンゼルス・ドジャースの選手は？',
+                options: ['ダルビッシュ有', '鈴木誠也', '大谷翔平', '山本由伸'],
+                answer: '大谷翔平',
+                explanation: '大谷翔平選手はドジャース移籍後も二刀流として驚異的な活躍を続け、松井秀喜氏の持つ日本人最多本塁打記録を塗り替えるなど歴史を作り続けています。'
+            }
+        ];
+
+        function App() {
+            const [view, setView] = useState('home'); 
+            const [questionsList, setQuestionsList] = useState([]);
+            const [currentIndex, setCurrentIndex] = useState(0);
+            const [score, setScore] = useState(0);
+            
+            const [selectedCategory, setSelectedCategory] = useState('すべて');
+            const [questionCount, setQuestionCount] = useState(10); 
+            
+            const [selectedAnswer, setSelectedAnswer] = useState(null);
+            const [isAnswered, setIsAnswered] = useState(false);
+            
+            const [isFlipped, setIsFlipped] = useState(false);
+
+            // Re-initialize icons when view changes
+            useEffect(() => {
+                lucide.createIcons();
+            }, [view, currentIndex, isAnswered, isFlipped]);
+
+            const startApp = (mode) => {
+                let filtered = questionsData;
+                
+                if (selectedCategory !== 'すべて') {
+                    filtered = questionsData.filter(q => q.category === selectedCategory);
+                }
+                
+                filtered = [...filtered].sort(() => Math.random() - 0.5).map(q => ({
+                    ...q,
+                    options: [...q.options].sort(() => Math.random() - 0.5)
+                }));
+                
+                if (questionCount !== 'all' && filtered.length > questionCount) {
+                    filtered = filtered.slice(0, questionCount);
+                }
+                
+                setQuestionsList(filtered);
+                setCurrentIndex(0);
+                setScore(0);
+                setSelectedAnswer(null);
+                setIsAnswered(false);
+                setIsFlipped(false);
+                setView(mode);
+            };
+
+            const handleAnswer = (option) => {
+                setSelectedAnswer(option);
+                setIsAnswered(true);
+                if (option === questionsList[currentIndex].answer) {
+                    setScore(s => s + 1);
+                }
+            };
+
+            const nextQuestion = () => {
+                if (currentIndex < questionsList.length - 1) {
+                    setCurrentIndex(c => c + 1);
+                    setSelectedAnswer(null);
+                    setIsAnswered(false);
+                } else {
+                    setView('result');
+                }
+            };
+
+            const nextFlashcard = () => {
+                if (currentIndex < questionsList.length - 1) {
+                    setIsFlipped(false);
+                    setTimeout(() => setCurrentIndex(c => c + 1), 150);
+                }
+            };
+
+            const prevFlashcard = () => {
+                if (currentIndex > 0) {
+                    setIsFlipped(false);
+                    setTimeout(() => setCurrentIndex(c => c - 1), 150);
+                }
+            };
+
+            const categories = ['すべて', ...new Set(questionsData.map(q => q.category))];
+
+            const renderHome = () => (
+                <div className="max-w-4xl mx-auto space-y-8 animate-fade-in pb-10">
+                <div className="text-center space-y-4 pt-4">
+                    <div className="inline-flex items-center justify-center p-4 bg-emerald-100 rounded-full mb-2 shadow-inner">
+                    <Clock className="w-14 h-14 text-emerald-600" />
+                    </div>
+                    <h1 className="text-3xl md:text-5xl font-extrabold text-slate-800 tracking-tight">
+                    2026年 春の時事マスター
+                    </h1>
+                    <div className="flex justify-center gap-2">
+                    <div className="inline-block bg-slate-800 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-sm">
+                        最新！ 2026年4月〜5月版
+                    </div>
+                    <div className="inline-block bg-yellow-400 text-slate-900 px-4 py-1.5 rounded-full text-sm font-bold shadow-sm">
+                        特大号 収録52問
+                    </div>
+                    </div>
+                    <p className="text-slate-500 max-w-xl mx-auto font-medium text-sm md:text-base leading-relaxed">
+                    自転車の青切符、カスハラ条例、追加利上げから国際情勢まで、直近のニュースを完全網羅。試験対策や一般常識のアップデートに！
+                    </p>
+                </div>
+
+                <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 md:p-8">
+                    <div className="grid md:grid-cols-2 gap-8 mb-8">
+                    <div className="space-y-4">
+                        <h2 className="text-lg font-bold flex items-center gap-2 text-slate-700">
+                        <BookOpen className="w-5 h-5 text-emerald-500" /> 出題ジャンル
+                        </h2>
+                        <div className="flex flex-wrap gap-2">
+                        {categories.map(cat => (
+                            <button
+                            key={cat}
+                            onClick={() => setSelectedCategory(cat)}
+                            className={`px-3 py-2 rounded-xl border-2 text-xs md:text-sm font-bold transition-all ${
+                                selectedCategory === cat 
+                                ? 'border-emerald-500 bg-emerald-50 text-emerald-700 shadow-sm' 
+                                : 'border-slate-100 bg-slate-50 hover:border-slate-300 text-slate-600 hover:bg-white'
+                            }`}
+                            >
+                            {cat}
+                            </button>
+                        ))}
+                        </div>
+                    </div>
+
+                    <div className="space-y-4">
+                        <h2 className="text-lg font-bold flex items-center gap-2 text-slate-700">
+                        <ListIcon className="w-5 h-5 text-emerald-500" /> 出題数
+                        </h2>
+                        <div className="flex gap-2 bg-slate-50 p-1.5 rounded-2xl border border-slate-100">
+                        {[
+                            { value: 10, label: '10問' },
+                            { value: 20, label: '20問' },
+                            { value: 'all', label: '全問' }
+                        ].map(count => (
+                            <button
+                            key={count.value}
+                            onClick={() => setQuestionCount(count.value)}
+                            className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all ${
+                                questionCount === count.value
+                                ? 'bg-white text-emerald-700 shadow border border-slate-200'
+                                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100'
+                            }`}
+                            >
+                            {count.label}
+                            </button>
+                        ))}
+                        </div>
+                        <p className="text-xs text-slate-400 font-medium px-2">
+                        ※選んだジャンルからランダムに出題されます。
+                        </p>
+                    </div>
+                    </div>
+
+                    <div className="w-full h-px bg-slate-100 mb-8"></div>
+
+                    <div className="grid md:grid-cols-2 gap-4">
+                    <button 
+                        onClick={() => startApp('quiz')}
+                        className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 p-6 text-white shadow-md hover:shadow-xl transition-all hover:-translate-y-1"
+                    >
+                        <div className="relative z-10 flex flex-col items-center gap-3">
+                        <Brain className="w-10 h-10 mb-1 group-hover:scale-110 transition-transform duration-300" />
+                        <span className="text-xl font-bold">クイズに挑戦</span>
+                        <span className="text-emerald-100 text-sm font-medium">4択問題で実力試し</span>
+                        </div>
+                        <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white opacity-10 rounded-full blur-2xl"></div>
+                    </button>
+
+                    <button 
+                        onClick={() => startApp('flashcard')}
+                        className="group relative overflow-hidden rounded-2xl bg-white border-2 border-slate-200 p-6 text-slate-700 shadow-sm hover:shadow-md hover:border-teal-300 transition-all hover:-translate-y-1"
+                    >
+                        <div className="relative z-10 flex flex-col items-center gap-3">
+                        <RotateCcw className="w-10 h-10 mb-1 text-teal-500 group-hover:-rotate-180 transition-transform duration-500" />
+                        <span className="text-xl font-bold">単語帳モード</span>
+                        <span className="text-slate-500 text-sm font-medium">自分のペースでサクッと暗記</span>
+                        </div>
+                    </button>
+                    </div>
+                </div>
+                </div>
+            );
+
+            const renderQuiz = () => (
+                <div className="max-w-2xl mx-auto w-full p-2 animate-fade-in pb-20">
+                <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 md:p-8">
+                    <div className="mb-6 flex items-center justify-between">
+                    <div className="flex flex-col flex-1">
+                        <span className="text-sm font-bold text-slate-400">Question {currentIndex + 1} of {questionsList.length}</span>
+                        <div className="w-full bg-slate-100 h-2 rounded-full mt-2 overflow-hidden">
+                        <div 
+                            className="bg-emerald-500 h-full transition-all duration-500" 
+                            style={{ width: `${((currentIndex + 1) / questionsList.length) * 100}%` }}
+                        ></div>
+                        </div>
+                    </div>
+                    <span className="bg-emerald-100 text-emerald-800 px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap ml-4">
+                        {questionsList[currentIndex].category}
+                    </span>
+                    </div>
+                    
+                    <h2 className="text-xl md:text-2xl font-bold mb-8 text-slate-800 leading-relaxed">
+                    {questionsList[currentIndex].question}
+                    </h2>
+                    
+                    <div className="space-y-3">
+                    {questionsList[currentIndex].options.map((opt, i) => {
+                        const isCorrect = opt === questionsList[currentIndex].answer;
+                        const isSelected = selectedAnswer === opt;
+                        let btnClass = "w-full text-left p-4 md:p-5 rounded-2xl border-2 transition-all duration-200 font-bold ";
+                        
+                        if (!isAnswered) {
+                            btnClass += "border-slate-200 bg-white hover:border-emerald-400 hover:bg-emerald-50 text-slate-700";
+                        } else {
+                            if (isCorrect) btnClass += "border-emerald-500 bg-emerald-50 text-emerald-800 shadow-sm";
+                            else if (isSelected) btnClass += "border-rose-500 bg-rose-50 text-rose-800 shadow-sm";
+                            else btnClass += "border-slate-100 bg-slate-50 text-slate-400 opacity-60";
+                        }
+                        
+                        return (
+                        <button 
+                            key={i} 
+                            disabled={isAnswered}
+                            className={btnClass}
+                            onClick={() => handleAnswer(opt)}
+                        >
+                            <div className="flex items-center justify-between">
+                                <span className="leading-snug">{opt}</span>
+                                {isAnswered && isCorrect && <CheckCircle2 className="text-emerald-500 w-6 h-6 flex-shrink-0 ml-3" />}
+                                {isAnswered && isSelected && !isCorrect && <XCircle className="text-rose-500 w-6 h-6 flex-shrink-0 ml-3" />}
+                            </div>
+                        </button>
+                        );
+                    })}
+                    </div>
+                    
+                    {isAnswered && (
+                    <div className="mt-8 p-5 bg-slate-50 rounded-2xl border border-slate-200 animate-fade-in relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-1 h-full bg-emerald-400"></div>
+                        <p className="font-bold text-slate-700 mb-2 flex items-center gap-2">
+                        <BookOpen className="w-4 h-4 text-emerald-500" /> ニュースの背景・解説
+                        </p>
+                        <p className="text-slate-600 text-sm md:text-base leading-relaxed font-medium">
+                        {questionsList[currentIndex].explanation}
+                        </p>
+                    </div>
+                    )}
+                    
+                    {isAnswered && (
+                    <button 
+                        onClick={nextQuestion}
+                        className="mt-8 w-full bg-slate-800 text-white font-bold py-4 rounded-2xl hover:bg-slate-700 shadow-md transition-all flex items-center justify-center gap-2"
+                    >
+                        {currentIndex === questionsList.length - 1 ? '結果を見る' : '次の問題へ'}
+                        <ArrowRight className="w-5 h-5" />
+                    </button>
+                    )}
+                </div>
+                </div>
+            );
+
+            const renderFlashcard = () => (
+                <div className="max-w-md mx-auto w-full p-2 animate-fade-in pb-20">
+                <div className="mb-6 flex justify-between items-center px-2 text-slate-500 font-bold">
+                    <span>単語帳 {currentIndex + 1} / {questionsList.length}</span>
+                </div>
+
+                <div 
+                    className="relative w-full h-[420px] cursor-pointer"
+                    style={{ perspective: '1000px' }}
+                    onClick={() => setIsFlipped(!isFlipped)}
+                >
+                    <div 
+                    className="w-full h-full transition-transform duration-500 relative"
+                    style={{ 
+                        transformStyle: 'preserve-3d', 
+                        transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)' 
+                    }}
+                    >
+                    <div 
+                        className="absolute w-full h-full bg-white border border-slate-200 rounded-3xl shadow-sm p-8 flex flex-col items-center justify-center"
+                        style={{ backfaceVisibility: 'hidden' }}
+                    >
+                        <span className="absolute top-6 left-6 bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-xs font-bold">
+                        {questionsList[currentIndex].category}
+                        </span>
+                        <h3 className="text-xl md:text-2xl font-bold text-center text-slate-800 leading-relaxed mt-4">
+                        {questionsList[currentIndex].question}
+                        </h3>
+                        <p className="absolute bottom-6 text-slate-400 text-sm font-bold flex items-center gap-2 bg-slate-50 px-4 py-2 rounded-full">
+                        <RotateCcw className="w-4 h-4" /> タップして答えを見る
+                        </p>
+                    </div>
+                    
+                    <div 
+                        className="absolute w-full h-full bg-gradient-to-br from-emerald-600 to-teal-700 rounded-3xl shadow-lg p-8 flex flex-col items-center justify-center text-white"
+                        style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+                    >
+                        <span className="absolute top-6 left-6 bg-white/20 px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm">
+                        解答・解説
+                        </span>
+                        <h3 className="text-2xl md:text-3xl font-extrabold text-center mb-6 mt-4 leading-tight">
+                        {questionsList[currentIndex].answer}
+                        </h3>
+                        <div className="w-full h-px bg-white/20 mb-6"></div>
+                        <p className="text-sm md:text-base text-center leading-relaxed text-emerald-50 font-medium">
+                        {questionsList[currentIndex].explanation}
+                        </p>
+                    </div>
+                    </div>
+                </div>
+                
+                <div className="flex justify-between items-center mt-10 px-2">
+                    <button 
+                        onClick={prevFlashcard} 
+                        disabled={currentIndex === 0} 
+                        className="p-4 rounded-full bg-white border border-slate-200 shadow-sm hover:bg-slate-50 disabled:opacity-30 transition-colors"
+                    >
+                        <ArrowLeft className="w-6 h-6 text-slate-700" />
+                    </button>
+                    <div className="text-sm font-bold text-slate-400">
+                        {currentIndex + 1} / {questionsList.length}
+                    </div>
+                    <button 
+                        onClick={nextFlashcard} 
+                        disabled={currentIndex === questionsList.length - 1} 
+                        className="p-4 rounded-full bg-white border border-slate-200 shadow-sm hover:bg-slate-50 disabled:opacity-30 transition-colors"
+                    >
+                        <ArrowRight className="w-6 h-6 text-slate-700" />
+                    </button>
+                </div>
+                </div>
+            );
+
+            const renderResult = () => (
+                <div className="max-w-xl mx-auto text-center space-y-8 animate-fade-in pb-10">
+                <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 md:p-12">
+                    <div className="inline-flex items-center justify-center p-6 bg-yellow-50 rounded-full mb-6">
+                    <Trophy className="w-20 h-20 text-yellow-500" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-slate-800 mb-2">クイズ結果</h2>
+                    <p className="text-slate-500 mb-8 font-bold">全 {questionsList.length} 問中...</p>
+                    
+                    <div className="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600 mb-10">
+                    {score} <span className="text-3xl text-slate-300">問正解</span>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button 
+                        onClick={() => startApp('quiz')}
+                        className="w-full sm:w-auto px-8 py-4 bg-emerald-600 text-white font-bold rounded-2xl shadow-md hover:bg-emerald-700 transition-colors inline-flex items-center justify-center gap-2"
+                    >
+                        <RotateCcw className="w-5 h-5" /> もう一度挑戦
+                    </button>
+                    <button 
+                        onClick={() => setView('home')}
+                        className="w-full sm:w-auto px-8 py-4 bg-slate-100 text-slate-700 font-bold rounded-2xl hover:bg-slate-200 transition-colors inline-flex items-center justify-center gap-2"
+                    >
+                        <ListIcon className="w-5 h-5" /> ホームに戻る
+                    </button>
+                    </div>
+                </div>
+                </div>
+            );
+
+            return (
+                <div className="min-h-screen bg-slate-50 font-sans text-slate-800 selection:bg-emerald-200">
+                    <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
+                    <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+                        <div 
+                        className="flex items-center gap-2 cursor-pointer group" 
+                        onClick={() => setView('home')}
+                        >
+                        <Clock className="w-6 h-6 text-emerald-600 group-hover:rotate-12 transition-transform" />
+                        <span className="font-extrabold text-lg tracking-tight text-slate-800">
+                            時事マスター<span className="text-emerald-600">春号</span>
+                        </span>
+                        </div>
+                        {view !== 'home' && (
+                        <button 
+                            onClick={() => setView('home')} 
+                            className="text-sm font-bold text-slate-500 hover:text-slate-800 flex items-center gap-1 transition-colors px-3 py-2 rounded-lg hover:bg-slate-100"
+                        >
+                            <ArrowLeft className="w-4 h-4" /> 終了する
+                        </button>
+                        )}
+                    </div>
+                    </header>
+                    
+                    <main className="container mx-auto p-4 py-8 md:py-12">
+                        {view === 'home' && renderHome()}
+                        {view === 'quiz' && renderQuiz()}
+                        {view === 'flashcard' && renderFlashcard()}
+                        {view === 'result' && renderResult()}
+                    </main>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
